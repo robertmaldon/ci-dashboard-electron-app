@@ -1,0 +1,17 @@
+{
+  "name": "ci-dashboard",
+  "description": "Continuous Integration server aggregator and notifier dashboard",
+  "version": "0.1",
+  "manifest_version": 2,
+  "app": {
+    "background": {
+      "scripts": ["js/background.js"]
+    }
+  },
+  "permissions": [
+    "<all_urls>",
+    "notifications",
+    "storage"
+  ],
+  "icons": { "16": "images/ci-16.png", "128": "images/ci-128.png" }
+}

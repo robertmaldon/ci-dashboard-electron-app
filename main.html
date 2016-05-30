@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="css/material-icons.css">
+    <link rel="stylesheet" type="text/css" href="css/materialize-0.97.6.min.css" media="screen,projection">
+    <link rel="stylesheet" type="text/css" href="css/app.css">
+    <title>cc-dashboard-app</title>
+    <script src="js/jquery-2.2.0.min.js"></script>
+    <script src="js/materialize-0.97.6.min.js"></script>
+    <script src="js/async-1.5.2.min.js"></script>
+    <script src="js/moment-2.11.2.js"></script>
+    <script src="js/squishy-1.0.1.js"></script>
+    <script src="js/defaultConfig.js"></script>
+    <script src="js/chrome-storage-wrapper-0.1.4.js"></script>
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  </head>
+  <body>
+    <div id="main" class="container">
+      <div id="top">
+        <span id="summary" class="summary"></span>
+        <img id="settings-open-icon" style="float: right" title="Settings" src="images/hamburger.png"></img>
+      </div>
+      <div id="projects" class="row"></div>
+    </div>
+    <div id="settings" class="container">
+      <h2>Settings</h2>
+        <h3>Servers</h3>
+        <div class="row">
+          <form id="settings-form" class="col s12" action="#">
+            <div id="settings-servers-list">
+            </div>
+            <div class="row">
+              <div class="col s4 offset-s8">
+                <a id="add-server" class="waves-effect btn-flat">Add server
+                  <i class="material-icons right">add</i>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s6 offset-s6">
+                <button id="save" type="submit" class="waves-effect btn">Save
+                  <i class="material-icons right">send</i>
+                </button>
+                <button id="cancel" class="waves-effect btn">Cancel
+                  <i class="material-icons right">clear</i>
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s6">
+                <a href="#reset-modal" id="reset" class="waves-effect btn modal-trigger">Reset to defaults
+                  <i class="material-icons right">flash_on</i>
+                </a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col s6">
+                <a href="#clear-all" id="clear-all" class="waves-effect btn">Clear all storage
+                  <i class="material-icons right">flash_on</i>
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div id="reset-modal" class="modal">
+          <div class="modal-content">
+            <h4>Reset to default configuration</h4>
+            <p>WARNING: Resetting to default configuration will wipe out all of
+            your changes. Are you feeling lucky, punk?</p>
+          </div>
+          <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-red btn-flat">Nnnnoooo!!!</a>
+            <a id="reset-confirm" href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Do it!</a>
+          </div>
+        </div>
+    </div>
+    <script src="js/settings.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
