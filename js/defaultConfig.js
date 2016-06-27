@@ -17,4 +17,7 @@ const defaultConfig = {"servers" : [
     "type": "bamboo",
     "path": "rss/createAllBuildsRssFeed.action?feedType=rssAll"
   }
-]};
+],
+"sounds": {
+  "enabled": true
+}};

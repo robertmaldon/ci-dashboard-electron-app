@@ -1,12 +1,16 @@
 'use strict';
 
-// Returns a new notification ID used in the notification.
+// Generate an id to use for a notification
 function getNotificationId() {
   var id = Math.floor(Math.random() * 9007199254740992) + 1;
   return id.toString();
 }
 
-function notifyProjects(projects, icon, title, message) {
+function notifyProjects(projects, success, title, message) {
+  let icon = 'images/ci-success-128.png';
+  if (!success) {
+    icon = 'images/ci-failed-128.png';
+  }
   projects.forEach(function(project, i) {
     const msg = `${project.name} ${message}`;
     const notificationOptions = {
@@ -18,6 +22,11 @@ function notifyProjects(projects, icon, title, message) {
     chrome.notifications.create(getNotificationId(), notificationOptions, function() {});
     console.log(`${project.name} #${project.lastBuildLabel} ${message}`);
   });
+  if (success) {
+    playSuccess();
+  } else {
+    playFailure();
+  }
 }
 
 function appendProject(project, i) {
@@ -103,7 +112,7 @@ let tasks = [];
 function createTasks(config) {
   tasks = [];
 
-  // iterate over the list of servers
+  // Iterate over the list of servers
   config.servers.forEach(function(server) {
     let feedUrl = server.baseUrl + '/' + server.path;
 
@@ -149,7 +158,7 @@ function pollServers() {
       console.log(err);
     }
 
-    // sort alphabetically
+    // Sort alphabetically
     projects.sort(function(a, b) {
       let aname = a.name || 'unknown';
       let bname = b.name || 'unknown';
@@ -220,13 +229,13 @@ function pollServers() {
         $('#summary').html(summaryTemplate);
 
       if (notifySucceeded.length > 0) {
-        notifyProjects(notifySucceeded, 'images/ci-success-128.png', 'build fixed!', 'was previously broken but is now fixed!');
+        notifyProjects(notifySucceeded, true, 'build fixed!', 'was previously broken but is now fixed!');
       }
       if (notifyFailed.length > 0) {
-        notifyProjects(notifyFailed, 'images/ci-failed-128.png', 'build broken!', 'is now broken!');
+        notifyProjects(notifyFailed, false, 'build broken!', 'is now broken!');
       }
       if (notifyFailedAgain.length > 0) {
-        notifyProjects(notifyFailedAgain, 'images/ci-failed-128.png', 'build still broken!', 'was previoulsy broken and is still broken!');
+        notifyProjects(notifyFailedAgain, false, 'build still broken!', 'was previoulsy broken and is still broken!');
       }
 
       chromeStorage.set({'states': states}).then(() => {
@@ -236,7 +245,7 @@ function pollServers() {
   });
 }
 
-// this is not a proper web application so we disable proper form submission
+// This is not a proper web application so we disable proper form submission
 $('form').submit(false);
 
 let mainTimer;
@@ -250,6 +259,12 @@ function main() {
     }
 
     createTasks(config);
+
+    audioEnabled = true;
+    if (config.sounds) {
+      audioEnabled = config.sounds.enabled;
+    }
+
     pollServers();
 
     mainTimer = setTimeout(main, 60 * 1000);
@@ -260,7 +275,7 @@ function main() {
   });
 }
 
-// many things could have happened since we were last running so ignore
+// Many things could have happened since we were last running so ignore
 // previously saved states...
 chromeStorage.set({'states': {}}).then(() => {
   main(); // ... and start er up!

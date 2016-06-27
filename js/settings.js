@@ -121,6 +121,12 @@ function showSettings() {
         addServer(server, i);
       });
     }
+    let soundEnabled = true;
+    if (result.config && result.config.sounds) {
+      const soundConfig = result.config.sounds;
+      soundEnabled = soundConfig.enabled;
+    }
+    $('#sounds-enabled').prop('checked', soundEnabled);
 
     $('.modal-trigger').leanModal();
 
@@ -147,8 +153,13 @@ function saveSettings() {
     servers.push(server);
   });
 
+  let sounds = {};
+  sounds['enabled'] = $('#sounds-enabled').is(':checked');
+  audioEnabled = sounds['enabled'];
+
   const config = {
-    "servers": servers
+    'servers': servers,
+    'sounds': sounds
   };
 
   chromeStorage.set({'config': config}).then(() => {
@@ -159,6 +170,7 @@ function saveSettings() {
 }
 
 function resetSettings() {
+  audioEnabled = true;
   chromeStorage.set({'config': defaultConfig}).then(() => {
     hideSettings();
     clearTimeout(mainTimer);
@@ -167,8 +179,8 @@ function resetSettings() {
 }
 
 function clearAll() {
+  audioEnabled = true;
   chromeStorage.clear().then(() => {
-    console.log('yep');
     hideSettings();
     clearTimeout(mainTimer);
     main();
