@@ -6,6 +6,14 @@ function getNotificationId() {
   return id.toString();
 }
 
+function logEvent(event, success) {
+  if ($('#events li').length > 4) {
+    $('#events li').last().remove();
+  }
+  const successClass = success ? 'event-success' : 'event-failure';
+  $('#events').prepend(`<li><span class="${successClass}">${moment().format('LTS')} ${event}</span></li>`);
+}
+
 function notifyProjects(projects, success, title, message) {
   let icon = 'images/ci-success-128.png';
   if (!success) {
@@ -20,7 +28,7 @@ function notifyProjects(projects, success, title, message) {
       message: msg
     };
     chrome.notifications.create(getNotificationId(), notificationOptions, function() {});
-    console.log(`${project.name} #${project.lastBuildLabel} ${message}`);
+    logEvent(`${project.name} #${project.lastBuildLabel} ${message}`, success);
   });
   if (success) {
     playSuccess();
