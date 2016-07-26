@@ -19,7 +19,8 @@
   <body>
     <div id="main" class="container">
       <div id="top">
-        <span id="summary" class="summary"></span>
+        <span id="summary" class="summary"><span class="summary-success"><i class="material-icons">sentiment_satisfied</i></span><span class="summary-building"><i class="material-icons">directions_run</i></span><span class="summary-failure"><i class="material-icons">sentiment_dissatisfied</i></span></span>
+        <div class="filter-container card"><input id="filter" placeholder="Filter projects using a regular expression"/><i id="filter-icon" class="material-icons">search</i></div>
         <img id="settings-open-icon" style="float: right" title="Settings" src="images/hamburger.png"></img>
       </div>
       <ul id="events" class="collection"></ul>

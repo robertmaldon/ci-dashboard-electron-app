@@ -29,6 +29,10 @@ html, body {
   padding: 10px 15px 50px 15px;
 }
 
+.summary {
+  float: left;
+}
+
 .summary-success {
   padding-left: 40px;
   color: var(--success-color);
@@ -47,6 +51,19 @@ html, body {
 #settings-open-icon {
   float: right;
   padding-right: 40px;
+}
+
+.filter-container {
+  margin: 0 0 0 40px;
+  float: left;
+  width: 50%;
+  height: 35px;
+}
+
+#filter {
+  width: 90%;
+  height: 100%;
+  margin: 0 0 0 10px;
 }
 
 #events {

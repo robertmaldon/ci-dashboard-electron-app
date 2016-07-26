@@ -1,5 +1,7 @@
 'use strict';
 
+let projectNameRegexpFilter = new RegExp();
+
 // Generate an id to use for a notification
 function getNotificationId() {
   var id = Math.floor(Math.random() * 9007199254740992) + 1;
@@ -166,7 +168,7 @@ function pollServers() {
       console.log(err);
     }
 
-    // Sort alphabetically
+    // Sort projects by name alphabetically
     projects.sort(function(a, b) {
       let aname = a.name || 'unknown';
       let bname = b.name || 'unknown';
@@ -178,6 +180,12 @@ function pollServers() {
       return 0;
     });
 
+    // Filter projects by name using a regexp
+    projects = projects.filter((project) => {
+      return projectNameRegexpFilter.test(project.name);
+    });
+
+    // Add the projects to the page
     projects.forEach(function(project, i) {
       appendProject(project, i);
     });
@@ -252,6 +260,29 @@ function pollServers() {
     });
   });
 }
+
+function filterByRegexp() {
+  const filterValue = $('#filter').val();
+  projectNameRegexpFilter = new RegExp(filterValue);
+  chromeStorage.set({'filter': filterValue}).then(() => {
+    clearTimeout(mainTimer);
+    main();
+  });
+}
+
+chromeStorage.get('filter').then(result => {
+  $('#filter').keypress(function (e) {
+    if (e.which == 13) { // return/enter key
+      filterByRegexp();
+      return false;
+    }
+  });
+  $('#filter-icon').click(filterByRegexp);
+
+  let filterValue = result.filter;
+  $('#filter').val(filterValue);
+  projectNameRegexpFilter = new RegExp(filterValue);
+});
 
 // This is not a proper web application so we disable proper form submission
 $('form').submit(false);
