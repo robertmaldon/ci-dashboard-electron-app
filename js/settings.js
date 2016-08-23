@@ -121,12 +121,13 @@ function showSettings() {
         addServer(server, i);
       });
     }
-    let soundEnabled = true;
     if (result.config && result.config.sounds) {
       const soundConfig = result.config.sounds;
-      soundEnabled = soundConfig.enabled;
+      audioTheme = soundConfig.theme;
     }
-    $('#sounds-enabled').prop('checked', soundEnabled);
+
+    $('#sounds-theme').val(audioTheme != null ? audioTheme : '');
+    $('#sounds-theme').material_select();
 
     $('.modal-trigger').leanModal();
 
@@ -154,8 +155,11 @@ function saveSettings() {
   });
 
   let sounds = {};
-  sounds['enabled'] = $('#sounds-enabled').is(':checked');
-  audioEnabled = sounds['enabled'];
+  sounds['theme'] = $('#sounds-theme').val();
+  if (sounds['theme'] == '') {
+    sounds['theme'] = null;
+  }
+  audioTheme = sounds['theme'];
 
   const config = {
     'servers': servers,
@@ -170,7 +174,7 @@ function saveSettings() {
 }
 
 function resetSettings() {
-  audioEnabled = true;
+  audioTheme = audioDefaultTheme;
   chromeStorage.set({'config': defaultConfig}).then(() => {
     hideSettings();
     clearTimeout(mainTimer);
@@ -179,7 +183,7 @@ function resetSettings() {
 }
 
 function clearAll() {
-  audioEnabled = true;
+  audioTheme = audioDefaultTheme;
   chromeStorage.clear().then(() => {
     hideSettings();
     clearTimeout(mainTimer);

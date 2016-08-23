@@ -299,9 +299,9 @@ function main() {
 
     createTasks(config);
 
-    audioEnabled = true;
+    audioTheme = audioDefaultTheme;
     if (config.sounds) {
-      audioEnabled = config.sounds.enabled;
+      audioTheme = config.sounds.theme;
     }
 
     pollServers();
@@ -315,7 +315,7 @@ function main() {
 }
 
 // Many things could have happened since we were last running so ignore
-// previously saved states...
+// previously saved states so throw away previous state data...
 chromeStorage.set({'states': {}}).then(() => {
   main(); // ... and start er up!
 });
