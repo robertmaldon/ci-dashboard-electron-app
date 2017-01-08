@@ -1,4 +1,6 @@
-const defaultConfig = {"servers" : [
+'use strict';
+
+module.exports = {"servers" : [
   {
     "id": "Apache",
     "type": "cctray",

@@ -4,14 +4,14 @@
     <link rel="stylesheet" type="text/css" href="css/material-icons.css">
     <link rel="stylesheet" type="text/css" href="css/materialize-0.97.6.min.css" media="screen,projection">
     <link rel="stylesheet" type="text/css" href="css/app.css">
-    <title>cc-dashboard-app</title>
-    <script src="js/jquery-2.2.0.min.js"></script>
+    <title>ci-dashboard</title>
+    <script>
+      // dependencies for materialize
+      window.$ = window.jQuery = require('./js/jquery-2.2.0.min.js');
+      window.Hammer = require('./js/hammer.min.js');
+    </script>
     <script src="js/materialize-0.97.6.min.js"></script>
-    <script src="js/async-1.5.2.min.js"></script>
-    <script src="js/moment-2.11.2.js"></script>
     <script src="js/squishy-1.0.1.js"></script>
-    <script src="js/defaultConfig.js"></script>
-    <script src="js/chrome-storage-wrapper-0.1.4.js"></script>
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -91,6 +91,10 @@
           </div>
         </div>
     </div>
+    <script>
+      const Config = require('electron-config');
+      const config = new Config();
+    </script>
     <script src="js/settings.js"></script>
     <script src="js/sounds.js"></script>
     <script src="js/app.js"></script>

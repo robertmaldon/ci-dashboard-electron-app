@@ -114,26 +114,26 @@ function addServer(server, i) {
 }
 
 function showSettings() {
-  chromeStorage.get('config').then(result => {
-    $('#settings-servers-list').empty();
-    if (result.config && result.config.servers) {
-      result.config.servers.forEach(function(server, i) {
-        addServer(server, i);
-      });
-    }
-    if (result.config && result.config.sounds) {
-      const soundConfig = result.config.sounds;
-      audioTheme = soundConfig.theme;
-    }
+  const cfg = config.get('config');
 
-    $('#sounds-theme').val(audioTheme != null ? audioTheme : '');
-    $('#sounds-theme').material_select();
+  $('#settings-servers-list').empty();
+  if (cfg && cfg.servers) {
+    cfg.servers.forEach(function(server, i) {
+      addServer(server, i);
+    });
+  }
+  if (cfg && cfg.sounds) {
+    const soundConfig = cfg.sounds;
+    audioTheme = soundConfig.theme;
+  }
 
-    $('.modal-trigger').leanModal();
+  $('#sounds-theme').val(audioTheme != null ? audioTheme : '');
+  $('#sounds-theme').material_select();
 
-    $('#main').slideUp(300);
-    $('#settings').slideDown(300);
-  });
+  $('.modal-trigger').leanModal();
+
+  $('#main').slideUp(300);
+  $('#settings').slideDown(300);
 }
 
 function hideSettings() {
@@ -161,34 +161,31 @@ function saveSettings() {
   }
   audioTheme = sounds['theme'];
 
-  const config = {
+  const cfg = {
     'servers': servers,
     'sounds': sounds
   };
 
-  chromeStorage.set({'config': config}).then(() => {
-    hideSettings();
-    clearTimeout(mainTimer);
-    main();
-  });
+  config.set('config', cfg);
+  hideSettings();
+  clearTimeout(mainTimer);
+  main();
 }
 
 function resetSettings() {
   audioTheme = audioDefaultTheme;
-  chromeStorage.set({'config': defaultConfig}).then(() => {
-    hideSettings();
-    clearTimeout(mainTimer);
-    main();
-  });
+  config.set('config', defaultConfig);
+  hideSettings();
+  clearTimeout(mainTimer);
+  main();
 }
 
 function clearAll() {
   audioTheme = audioDefaultTheme;
-  chromeStorage.clear().then(() => {
-    hideSettings();
-    clearTimeout(mainTimer);
-    main();
-  });
+  config.clear();
+  hideSettings();
+  clearTimeout(mainTimer);
+  main();
 }
 
 $('#settings-open-icon').click(showSettings);

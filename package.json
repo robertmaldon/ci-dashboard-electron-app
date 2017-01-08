@@ -1,0 +1,42 @@
+{
+  "name": "ci-dashboard",
+  "version": "0.1.0",
+  "description": "Aggregates and radiates build stati from multiple continuous integration servers",
+  "main": "main.js",
+  "build": {
+    "appId": "org.robertmaldon.ci-dashboard",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    }
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "build --dir",
+    "dist": "build",
+    "dist:mac": "build -m",
+    "dist:linux": "build -l deb tar.xz",
+    "dist:win": "build -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/robertmaldon/ci-dashboard-electron-app.git"
+  },
+  "keywords": [],
+  "author": "Robert Maldon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/robertmaldon/ci-dashboard-electron-app/issues"
+  },
+  "homepage": "https://github.com/robertmaldon/ci-dashboard-electron-app#readme",
+  "devDependencies": {
+    "electron": "^1.4.13",
+    "electron-builder": "^10.17.3"
+  },
+  "dependencies": {
+    "async": "^2.1.4",
+    "electron-config": "^0.2.1",
+    "electron-debug": "^1.1.0",
+    "moment": "^2.17.1"
+  }
+}

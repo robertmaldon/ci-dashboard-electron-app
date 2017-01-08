@@ -1,7 +1,7 @@
-ci-dashboard-chrome-app
-=======================
+ci-dashboard
+============
 
-A Chrome application that aggregates build status from multiple continuous integration servers and radiates (fun!) notifications of build events.
+An [Electron](http://electron.atom.io/) application that aggregates build status from multiple continuous integration servers and radiates (fun!) notifications of build events.
 
 ## Why do we need it?
 
@@ -17,29 +17,7 @@ Another common issue I've found with CI notification systems is that their often
 
 ## Install
 
-This app is a [Chrome app](https://developer.chrome.com/apps/about_apps) and therefore Chrome needs to be installed before this app can be installed.
-
-I'm still debating if it is worth the effort to publish the app in the Chrome store, but for now you have to install it manually:
-
-1. Clone this repo or download a zip of the repo
-
-    git clone https://github.com/robertmaldon/ci-dashboard-chrome-app.git
-
-2. Enable Chrome extensions "Developer mode"
-
-    a) Go to chrome://extensions/
-
-    b) Check "Developer mode"
-
-3. Load the app as an unpacked extension
-
-    a) Click the "Load unpacked extension..." button
-
-    b) Navigate to the local file system location where the ci-dashboard-chrome-app repo was clones/unzipped
-
-    c) Click the "Select" button
-
-    d) Click the "Launch" link in the "ci-dashboard" section of the extensions list
+Being an electron app you need to download a platform-specific installer.
 
 ## Configuration
 
@@ -78,6 +56,36 @@ Sample bamboo RSS feed url - https://build.springsource.org/rss/createAllBuildsR
 
 (NOTE: There is an [unsupported cctray plugin for Bamboo](https://marketplace.atlassian.com/plugins/com.atlassian.plugins.bamboo.cctray.cctray-bamboo-plugin/server/overview). I've never tried it.)
 
+## Development
+
+To make changes to the application you need to:
+
+1. git clone this repo
+1. Install node v6.5.0
+
+   I recommend you install node via [nvm](https://github.com/creationix/nvm#installation). If you do you can run 'nvm install && nvm use' in the project root to use the same node version as used by electron.
+
+1. Install npm dependencies by doing an 'npm install'
+1. Start the app by doing an 'npm start'
+
+## Packaging
+
+[electron-builder](https://github.com/electron-userland/electron-builder) is used to create platform-specific installers for the app. To be able to create a build for a particular platform you will need to [install prerequisite tools](https://github.com/electron-userland/electron-builder/wiki/Multi-Platform-Build).
+
+Once you have the necessary tools installed you can build for your current platform:
+
+```
+npm run dist
+```
+
+e.g. on a mac this will create a dist/mac/ci-dashboard-VERSION.dmg installer.
+
+NOTE: An installed/unpacked bare-bones electron app will take up about 110 MB of disk space. Yep, pretty large. Nope, nobody has figured out a way to strip it down to something smaller.
+
+## DevTools
+
+ci-dashboard includes the [electron-debug](https://github.com/sindresorhus/electron-debug) node module, which provides shortcuts for displaying Chrome DevTools and reloading the app.
+
 ## Credits
 
 This app could not have been built without the hard work of others.
@@ -87,7 +95,7 @@ This app could not have been built without the hard work of others.
 * [squishy](https://github.com/lemonmade/squishy) fits varying size project names to their container width
 * [moment.js](http://momentjs.com/) gives us some nice date/time functions
 * [async.js](https://github.com/caolan/async) helps us deal with javascript callback concurrency
-* [chrome-storage-wrapper](https://github.com/lmk123/chrome-storage-wrapper) provides a sane promise wrapper around the [chrome.storage api](https://developer.chrome.com/extensions/storage)
+* [electron-builder](https://github.com/electron-userland/electron-builder) for packaging and publishing platform-specific installers
 
 # License
 

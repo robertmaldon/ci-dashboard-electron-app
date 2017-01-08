@@ -1,2 +1,7 @@
 # OSX spotlight directory index files
 .DS_Store
+
+# dir where electron-builder writes installers to
+dist
+
+node_modules

@@ -1,12 +1,13 @@
 'use strict';
 
-let projectNameRegexpFilter = new RegExp();
+console.info(`Using node ${process.versions.node}, chromium ${process.versions.chrome} and electron ${process.versions.electron}`);
 
-// Generate an id to use for a notification
-function getNotificationId() {
-  var id = Math.floor(Math.random() * 9007199254740992) + 1;
-  return id.toString();
-}
+const async = require('async');
+const defaultConfig = require('./js/defaultConfig');
+const moment = require('moment');
+const path = require('path');
+
+let projectNameRegexpFilter = new RegExp();
 
 function logEvent(event, success) {
   if ($('#events li').length > 4) {
@@ -24,12 +25,11 @@ function notifyProjects(projects, success, title, message) {
   projects.forEach(function(project, i) {
     const msg = `${project.name} ${message}`;
     const notificationOptions = {
-      type: 'basic',
-      iconUrl: icon,
       title: `${project.name} #${project.lastBuildLabel} ${title}`,
-      message: msg
+      body: msg,
+      icon: path.join(__dirname, icon)
     };
-    chrome.notifications.create(getNotificationId(), notificationOptions, function() {});
+    new Notification(notificationOptions.title, notificationOptions);
     logEvent(`${project.name} #${project.lastBuildLabel} ${message}`, success);
   });
   if (success) {
@@ -199,90 +199,85 @@ function pollServers() {
 
     console.log('tock');
 
-    chromeStorage.get('states').then(result => {
-      let notifySucceeded = [];
-      let notifyFailed = [];
-      let notifyFailedAgain = [];
+    const statesCfg = config.get('states');
 
-      let success = 0;
-      let building = 0;
-      let failure = 0;
+    let notifySucceeded = [];
+    let notifyFailed = [];
+    let notifyFailedAgain = [];
 
-      const states = {};
+    let success = 0;
+    let building = 0;
+    let failure = 0;
 
-      let previousStates = result.states || {};
+    const states = {};
 
-      projects.forEach(function(project, i) {
-        const previousState = previousStates[project.webUrl];
-        if (previousState) {
-          if ((previousState.lastBuildStatus === 'Success') && (project.lastBuildStatus !== 'Success')) {
-            // The simplest case. The last status was 'Success' and the current status is not 'Success'
-            notifyFailed.push(project);
-          } else if (previousState.lastBuildStatus === 'Failure') {
-            if (project.lastBuildStatus === 'Success') {
-              // The last status was 'Failure' and the current status is 'Success'
-              notifySucceeded.push(project);
-            } else if (project.lastBuildLabel !== previousState.lastBuildLabel) {
-              // The last status was 'Failure' and a new build - just finished - failed again
-              notifyFailedAgain.push(project);
-            }
+    let previousStates = statesCfg || {};
+
+    projects.forEach(function(project, i) {
+      const previousState = previousStates[project.webUrl];
+      if (previousState) {
+        if ((previousState.lastBuildStatus === 'Success') && (project.lastBuildStatus !== 'Success')) {
+          // The simplest case. The last status was 'Success' and the current status is not 'Success'
+          notifyFailed.push(project);
+        } else if (previousState.lastBuildStatus === 'Failure') {
+          if (project.lastBuildStatus === 'Success') {
+            // The last status was 'Failure' and the current status is 'Success'
+            notifySucceeded.push(project);
+          } else if (project.lastBuildLabel !== previousState.lastBuildLabel) {
+            // The last status was 'Failure' and a new build - just finished - failed again
+            notifyFailedAgain.push(project);
           }
         }
-
-        if (project.activity === 'Building') {
-          building = building + 1;
-        } else if (project.lastBuildStatus === 'Success') {
-          success = success + 1;
-        } else if (project.lastBuildStatus === 'Failure') {
-          failure = failure + 1;
-        }
-
-        states[project.webUrl] = project;
-      });
-
-      let summaryTemplate =
-        `<span class="summary-success"><i class="material-icons">sentiment_satisfied</i> ${success}</span><span class="summary-building"><i class="material-icons">directions_run</i> ${building}</span><span class="summary-failure"><i class="material-icons">sentiment_dissatisfied</i> ${failure}</span>`;
-        $('#summary').html(summaryTemplate);
-
-      if (notifySucceeded.length > 0) {
-        notifyProjects(notifySucceeded, true, 'build fixed!', 'was previously broken but is now fixed!');
-      }
-      if (notifyFailed.length > 0) {
-        notifyProjects(notifyFailed, false, 'build broken!', 'is now broken!');
-      }
-      if (notifyFailedAgain.length > 0) {
-        notifyProjects(notifyFailedAgain, false, 'build still broken!', 'was previoulsy broken and is still broken!');
       }
 
-      chromeStorage.set({'states': states}).then(() => {
-        // nothing to do
-      });
+      if (project.activity === 'Building') {
+        building = building + 1;
+      } else if (project.lastBuildStatus === 'Success') {
+        success = success + 1;
+      } else if (project.lastBuildStatus === 'Failure') {
+        failure = failure + 1;
+      }
+
+      states[project.webUrl] = project;
     });
+
+    let summaryTemplate =
+      `<span class="summary-success"><i class="material-icons">sentiment_satisfied</i> ${success}</span><span class="summary-building"><i class="material-icons">directions_run</i> ${building}</span><span class="summary-failure"><i class="material-icons">sentiment_dissatisfied</i> ${failure}</span>`;
+      $('#summary').html(summaryTemplate);
+
+    if (notifySucceeded.length > 0) {
+      notifyProjects(notifySucceeded, true, 'build fixed!', 'was previously broken but is now fixed!');
+    }
+    if (notifyFailed.length > 0) {
+      notifyProjects(notifyFailed, false, 'build broken!', 'is now broken!');
+    }
+    if (notifyFailedAgain.length > 0) {
+      notifyProjects(notifyFailedAgain, false, 'build still broken!', 'was previoulsy broken and is still broken!');
+    }
+
+    config.set('states', states);
   });
 }
 
 function filterByRegexp() {
   const filterValue = $('#filter').val();
   projectNameRegexpFilter = new RegExp(filterValue);
-  chromeStorage.set({'filter': filterValue}).then(() => {
-    clearTimeout(mainTimer);
-    main();
-  });
+  config.set('filter', filterValue);
+  clearTimeout(mainTimer);
+  main();
 }
 
-chromeStorage.get('filter').then(result => {
-  $('#filter').keypress(function (e) {
-    if (e.which == 13) { // return/enter key
-      filterByRegexp();
-      return false;
-    }
-  });
-  $('#filter-icon').click(filterByRegexp);
-
-  let filterValue = result.filter;
-  $('#filter').val(filterValue);
-  projectNameRegexpFilter = new RegExp(filterValue);
+$('#filter').keypress(function (e) {
+  if (e.which == 13) { // return/enter key
+    filterByRegexp();
+    return false;
+  }
 });
+$('#filter-icon').click(filterByRegexp);
+
+const filterCfg = config.get('filter');
+$('#filter').val(filterCfg);
+projectNameRegexpFilter = new RegExp(filterCfg);
 
 // This is not a proper web application so we disable proper form submission
 $('form').submit(false);
@@ -290,32 +285,27 @@ $('form').submit(false);
 let mainTimer;
 
 function main() {
-  chromeStorage.get('config').then(result => {
-    let config = result.config;
-    if (!config || !config.servers) {
-      console.log('Setting config using defaults');
-      config = defaultConfig;
-    }
+  let cfg = config.get('config');
+  if (!cfg || !cfg.servers) {
+    console.log('Setting config using defaults');
+    cfg = defaultConfig;
+  }
 
-    createTasks(config);
+  createTasks(cfg);
 
-    audioTheme = audioDefaultTheme;
-    if (config.sounds) {
-      audioTheme = config.sounds.theme;
-    }
+  audioTheme = audioDefaultTheme;
+  if (cfg.sounds) {
+    audioTheme = cfg.sounds.theme;
+  }
 
-    pollServers();
+  pollServers();
 
-    mainTimer = setTimeout(main, 60 * 1000);
+  mainTimer = setTimeout(main, 60 * 1000);
 
-    chromeStorage.set({'config': config}).then(() => {
-      // nothing to do
-    });
-  });
+  config.set('config', cfg);
 }
 
-// Many things could have happened since we were last running so ignore
-// previously saved states so throw away previous state data...
-chromeStorage.set({'states': {}}).then(() => {
-  main(); // ... and start er up!
-});
+// Many things could have happened since we were last running so throw
+// away previously saved state data...
+config.set('states', {});
+main(); // ... and start er up!
